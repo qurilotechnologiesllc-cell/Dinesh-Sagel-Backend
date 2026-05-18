@@ -3,11 +3,10 @@ const RevokedToken = require('../models/revokedToken');
 const { generateToken } = require('../middleware/auth');
 const { sendEmailOtp } = require('../utils/sendMail');
 const { cloudinary } = require('../utils/cloudinary');
-const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 const redisClient = require('../utils/redis');
 const jwt = require('jsonwebtoken');
-const { deleteImage } = require("../utils/cloudinary")
+const { deleteImage, uploadToCloudinary } = require("../utils/cloudinary")
 
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString()
@@ -74,7 +73,7 @@ const verifyOtp = async (req, res) => {
 
 const updateAdminProfile = async (req, res) => {
     const adminId = req.user.id;
-    const { username, email, imageUrl, publicId } = req.body;
+    const { username, email } = req.body;
 
     try {
         const admin = await Admin.findById(adminId);
@@ -85,13 +84,20 @@ const updateAdminProfile = async (req, res) => {
         admin.username = username || admin.username;
         admin.email = email || admin.email;
 
-        if (imageUrl && publicId) {
+        // ✅ req.file.buffer = RAM mein hai
+        // Disk pe kuch nahi gaya!
+        const result = await uploadToCloudinary(
+            req.file.buffer,           // ← Buffer from RAM
+            'gym/images' // ← Cloudinary folder
+        )
+
+        if (result && result.secure_url) {
             // Purani image delete karo agar exist karti hai
             if (admin.publicId) {
                 await deleteImage(admin.publicId);
             }
-            admin.imageUrl = imageUrl;
-            admin.publicId = publicId;
+            admin.profilePicture = result.secure_url;
+            admin.publicId = result.public_id;
         }
 
         await admin.save();
@@ -156,4 +162,20 @@ const generateUploadSignature = async (req, res) => {
     }
 }
 
-module.exports = { adminSendOtpOnEmail, verifyOtp, updateAdminProfile, logoutAdmin, generateUploadSignature };
+const getAdminProfile = async (req, res) => {
+    const adminId = req.user.id;
+
+    try {
+        const admin = await Admin.findById(adminId).select('-__v -_id');
+        if (!admin) {
+            return res.status(404).json({ message: 'Admin not found' });
+        }
+
+        return res.status(200).json({ success: true, admin });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Server error' });
+    }
+}
+
+module.exports = { adminSendOtpOnEmail, verifyOtp, updateAdminProfile, logoutAdmin, generateUploadSignature, getAdminProfile  };
