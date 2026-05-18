@@ -6,6 +6,7 @@ const contactUsRoutes = require('./routers/contactUsRoutes');
 const blogRoutes = require('./routers/blogRoutes');
 const gymPlanRoutes = require('./routers/gymplanRoutes');
 const userEnquiryRoutes = require('./routers/userEnquiryRoutes');
+const bannerRoutes = require('./routers/bannerRoutes');
 
 
 app.use(cors());
@@ -16,8 +17,7 @@ app.use('/api/plans', gymPlanRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api', userEnquiryRoutes);
 app.use('/api', contactUsRoutes);
-
-
+app.use('/api', bannerRoutes);
 
 app.get('/', (req, res) => {
     res.send('Dear Binod Tum Chutiya ho backend Chal gya hai apna kaam aage ka kaam kro !');
