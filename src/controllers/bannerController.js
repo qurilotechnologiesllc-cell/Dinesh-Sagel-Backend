@@ -8,7 +8,7 @@ exports.createBanner = async (req, res) => {
             return res.status(400).json({ message: 'Image file is required' });
         }
 
-        const result = await uploadToCloudinary(req.file.buffer, 'banners');
+        const result = await uploadToCloudinary(req.file.buffer, 'gym/images');
         const newBanner = new Banner({
             title,
             bannerfor,
