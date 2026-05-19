@@ -3,7 +3,7 @@ const { uploadToCloudinary, deleteImage } = require('../utils/cloudinary');
 
 exports.createBanner = async (req, res) => {
     try {
-        const { title, bannerfor } = req.body;
+        const { title, bannerfor, description } = req.body;
         if (!req.file) {
             return res.status(400).json({ message: 'Image file is required' });
         }
@@ -12,6 +12,7 @@ exports.createBanner = async (req, res) => {
         const newBanner = new Banner({
             title,
             bannerfor,
+            description,
             imageUrl: result.secure_url,
             public_id: result.public_id
         });
