@@ -29,6 +29,10 @@ exports.createBanner = async (req, res) => {
 
         res.status(201).json({ success: true, banner: newBanner });
     } catch (error) {
+
+        if (result?.public_id) {
+            await cloudinary.uploader.destroy(result.public_id)
+        }
         console.error('Error creating banner:', error);
         res.status(500).json({ message: 'Server error' });
     }
@@ -52,7 +56,7 @@ exports.getBanners = async (req, res) => {
 exports.updateBanner = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, bannerfor, description } = req.body;
+        const { title, bannerfor, description , duration} = req.body;
 
         const banner = await Banner.findById(id);
         if (!banner) {
@@ -70,9 +74,9 @@ exports.updateBanner = async (req, res) => {
         banner.title = title || banner.title;
         banner.bannerfor = bannerfor || banner.bannerfor;
         banner.description = description || banner.description;
-
+        banner.duration = duration || banner.duration;
         await banner.save();
-        res.status(200).json(banner);
+        res.status(200).json({ success: true, banner });
     } catch (error) {
         console.error('Error updating banner:', error);
         res.status(500).json({ message: 'Server error' });
