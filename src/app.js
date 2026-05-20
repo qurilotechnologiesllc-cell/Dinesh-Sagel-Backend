@@ -13,6 +13,7 @@ const blogRoutes = require('./routers/blogRoutes');
 const gymPlanRoutes = require('./routers/gymplanRoutes');
 const userEnquiryRoutes = require('./routers/userEnquiryRoutes');
 const bannerRoutes = require('./routers/bannerRoutes');
+const VideoPlanRoutes = require('./routers/videoPlanRoutes');
 
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -37,6 +38,7 @@ app.use('/api/blogs', blogRoutes);
 app.use('/api', userEnquiryRoutes);
 app.use('/api', contactUsRoutes);
 app.use('/api', bannerRoutes);
+app.use('/api', VideoPlanRoutes);
 
 app.get('/', (req, res) => {
     res.send('Welcome to the Gym API');

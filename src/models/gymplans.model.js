@@ -31,6 +31,8 @@ const planSchema = new Schema({
     ]
 }, { timestamps: true });
 
+planSchema.index({ category: 1 });
+
 const Plan = model('Plan', planSchema);
 
 module.exports = Plan;

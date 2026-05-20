@@ -1,7 +1,7 @@
 {
     "info": {
         "name": "Gym Backend API",
-        "description": "Admin Authentication, Blog, Contact Us, Gym Plan, Banner, and User Enquiry API for Gym Backend",
+        "description": "Admin Authentication, Blog, Contact Us, Gym Plan, Video Plan, Banner, and User Enquiry API for Gym Backend",
         "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
     },
     "variable": [
@@ -825,6 +825,123 @@
                             ]
                         },
                         "description": "Delete a banner and remove its image from Cloudinary"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Video Plan",
+            "item": [
+                {
+                    "name": "Create Video Plan",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Beginner Yoga\",\n  \"description\": \"Introductory yoga sessions\",\n  \"duration\": \"4 weeks\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/video-plans",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "video-plans"
+                            ]
+                        },
+                        "description": "Add a new video plan"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Video Plans",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/video-plans",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "video-plans"
+                            ]
+                        },
+                        "description": "Retrieve all video plans"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Video Plan",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"title\": \"Beginner Yoga Updated\",\n  \"description\": \"Updated description\",\n  \"duration\": \"6 weeks\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/video-plans/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "video-plans",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "video_plan_id_here",
+                                    "description": "Video Plan ID to update"
+                                }
+                            ]
+                        },
+                        "description": "Update a video plan by ID"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Video Plan",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{base_url}}/api/video-plans/:id",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "video-plans",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "video_plan_id_here",
+                                    "description": "Video Plan ID to delete"
+                                }
+                            ]
+                        },
+                        "description": "Delete a video plan by ID"
                     },
                     "response": []
                 }
