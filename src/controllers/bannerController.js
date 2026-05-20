@@ -3,22 +3,31 @@ const { uploadToCloudinary, deleteImage } = require('../utils/cloudinary');
 
 exports.createBanner = async (req, res) => {
     try {
-        const { title, bannerfor, description } = req.body;
+        const { title, bannerfor, description, duration } = req.body;
         if (!req.file) {
             return res.status(400).json({ message: 'Image file is required' });
         }
 
         const result = await uploadToCloudinary(req.file.buffer, 'gym/images');
-        const newBanner = new Banner({
+
+        // ✅ Base object — common fields
+        const bannerData = {
             title,
             bannerfor,
-            description,
             imageUrl: result.secure_url,
             public_id: result.public_id
-        });
+        }
 
-        await newBanner.save();
-        res.status(201).json(newBanner);
+        // sirf extra fields add karo!
+        if (bannerfor === 'transformation') {
+            bannerData.description = description
+            bannerData.duration = duration
+        }
+
+        // ✅ Ek baar save karo!
+        const newBanner = await Banner.create(bannerData)
+
+        res.status(201).json({ success: true, banner: newBanner });
     } catch (error) {
         console.error('Error creating banner:', error);
         res.status(500).json({ message: 'Server error' });
@@ -88,5 +97,5 @@ exports.deleteBanner = async (req, res) => {
         console.error('Error deleting banner:', error);
         res.status(500).json({ message: 'Server error' });
     }
-}; 
+};
 

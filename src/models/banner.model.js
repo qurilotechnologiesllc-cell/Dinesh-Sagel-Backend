@@ -18,6 +18,10 @@ const bannerSchema = new Schema({
         enum: ['home', 'transformation',],
         required: true
     },
+    duration: {
+        type: String,
+        default: ''
+    },
     description: {
         type: String,
         default: ''
