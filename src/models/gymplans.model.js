@@ -18,6 +18,11 @@ const planSchema = new Schema({
         type: String,
         required: true
     },
+    category: {
+        type: String,
+        enum: ["transformation", "diet"],
+        required: true
+    },
     features: [
         {
             type: String,
