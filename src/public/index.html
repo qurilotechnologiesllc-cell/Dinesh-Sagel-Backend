@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin — Live Notifications</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0f0f0f;
+            color: #fff;
+            min-height: 100vh;
+            padding: 30px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #222;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .header h1 span {
+            color: #f5a623;
+        }
+
+        /* Connection Status */
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff4444;
+            transition: background 0.3s;
+        }
+
+        .status-dot.connected {
+            background: #44ff88;
+            box-shadow: 0 0 8px #44ff88;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: #1a1a1a;
+            border: 1px solid #222;
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+        }
+
+        .stat-card .num {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f5a623;
+        }
+
+        .stat-card .label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* Notification Bell */
+        .bell-wrap {
+            position: relative;
+            display: inline-block;
+        }
+
+        .bell {
+            font-size: 22px;
+            cursor: pointer;
+            animation: none;
+        }
+
+        .bell.ring {
+            animation: ring 0.5s ease 3;
+        }
+
+        @keyframes ring {
+            0%  { transform: rotate(0deg);   }
+            25% { transform: rotate(20deg);  }
+            50% { transform: rotate(-20deg); }
+            75% { transform: rotate(10deg);  }
+            100%{ transform: rotate(0deg);   }
+        }
+
+        .badge {
+            position: absolute;
+            top: -6px;
+            right: -8px;
+            background: #ff4444;
+            color: #fff;
+            font-size: 10px;
+            font-weight: 700;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+
+        /* Notifications List */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .clear-btn {
+            background: transparent;
+            border: 1px solid #333;
+            color: #666;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .clear-btn:hover {
+            border-color: #ff4444;
+            color: #ff4444;
+        }
+
+        #notification-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Notification Card */
+        .notif-card {
+            background: #1a1a1a;
+            border: 1px solid #222;
+            border-left: 3px solid #f5a623;
+            border-radius: 10px;
+            padding: 16px 18px;
+            animation: slideIn 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notif-card.new {
+            border-left-color: #44ff88;
+            background: #0f1f0f;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notif-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .notif-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .notif-time {
+            font-size: 11px;
+            color: #555;
+        }
+
+        .notif-email {
+            font-size: 12px;
+            color: #f5a623;
+            margin-bottom: 8px;
+        }
+
+        .notif-message {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .new-tag {
+            display: inline-block;
+            background: #44ff88;
+            color: #000;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            margin-left: 8px;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #333;
+        }
+
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Toast Popup */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #1a1a1a;
+            border: 1px solid #f5a623;
+            border-radius: 12px;
+            padding: 16px 20px;
+            min-width: 280px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 999;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #f5a623;
+            margin-bottom: 5px;
+        }
+
+        .toast-body {
+            font-size: 12px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">
+        <h1>💪 <span>Gym</span> Admin — Live Enquiries</h1>
+        <div style="display:flex; align-items:center; gap:20px;">
+            <div class="bell-wrap">
+                <span class="bell" id="bell">🔔</span>
+                <span class="badge" id="badge">0</span>
+            </div>
+            <div class="status">
+                <div class="status-dot" id="status-dot"></div>
+                <span id="status-text">Connecting...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-bar">
+        <div class="stat-card">
+            <div class="num" id="total-count">0</div>
+            <div class="label">Total Enquiries</div>
+        </div>
+        <div class="stat-card">
+            <div class="num" id="new-count" style="color:#44ff88">0</div>
+            <div class="label">New Today</div>
+        </div>
+        <div class="stat-card">
+            <div class="num" id="unread-count" style="color:#ff4444">0</div>
+            <div class="label">Unread</div>
+        </div>
+    </div>
+
+    <!-- Notifications -->
+    <div class="section-header">
+        <span class="section-title">Live Notifications</span>
+        <button class="clear-btn" onclick="clearAll()">Clear All</button>
+    </div>
+
+    <div id="notification-list">
+        <!-- Empty State -->
+        <div class="empty-state" id="empty-state">
+            <div class="icon">📭</div>
+            <p>Waiting for enquiries...</p>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast">
+        <div class="toast-title" id="toast-title">New Enquiry!</div>
+        <div class="toast-body" id="toast-body"></div>
+    </div>
+
+<script>
+    // ─── State ───────────────────────────────
+    let totalCount  = 0
+    let newCount    = 0
+    let unreadCount = 0
+
+    // ─── Socket Connect ───────────────────────
+    const socket = io()
+
+    socket.on('connect', () => {
+        document.getElementById('status-dot').classList.add('connected')
+        document.getElementById('status-text').textContent = 'Connected'
+        console.log('Socket connected:', socket.id)
+    })
+
+    socket.on('disconnect', () => {
+        document.getElementById('status-dot').classList.remove('connected')
+        document.getElementById('status-text').textContent = 'Disconnected'
+    })
+
+    // ─── New Enquiry Event ────────────────────
+    socket.on('new_enquiry', (data) => {
+        console.log('New enquiry:', data)
+
+        const enquiry = data.enquiry
+
+        // Counts update karo
+        totalCount++
+        newCount++
+        unreadCount++
+        updateCounts()
+
+        // Notification card add karo
+        addNotificationCard(enquiry)
+
+        // Bell ring karo
+        ringBell()
+
+        // Toast dikhao
+        showToast(enquiry)
+    })
+
+    // ─── Notification Card ────────────────────
+    function addNotificationCard(enquiry) {
+
+        // Empty state hatao
+        const empty = document.getElementById('empty-state')
+        if (empty) empty.remove()
+
+        const list = document.getElementById('notification-list')
+        const time = new Date().toLocaleTimeString()
+
+        const card = document.createElement('div')
+        card.className = 'notif-card new'
+        card.innerHTML = `
+            <div class="notif-top">
+                <span class="notif-name">
+                    ${enquiry.name}
+                    <span class="new-tag">NEW</span>
+                </span>
+                <span class="notif-time">${time}</span>
+            </div>
+            <div class="notif-email">📧 ${enquiry.email}</div>
+            <div class="notif-message">💬 ${enquiry.message}</div>
+        `
+
+        // Naya card upar dikhao
+        list.insertBefore(card, list.firstChild)
+
+        // 3 sec baad "new" style hatao
+        setTimeout(() => {
+            card.classList.remove('new')
+            card.querySelector('.new-tag')?.remove()
+        }, 3000)
+    }
+
+    // ─── Counts Update ────────────────────────
+    function updateCounts() {
+        document.getElementById('total-count').textContent  = totalCount
+        document.getElementById('new-count').textContent    = newCount
+        document.getElementById('unread-count').textContent = unreadCount
+
+        // Badge update
+        const badge = document.getElementById('badge')
+        if (unreadCount > 0) {
+            badge.style.display = 'flex'
+            badge.textContent   = unreadCount > 9 ? '9+' : unreadCount
+        }
+    }
+
+    // ─── Bell Ring ────────────────────────────
+    function ringBell() {
+        const bell = document.getElementById('bell')
+        bell.classList.remove('ring')
+        void bell.offsetWidth   // Reflow
+        bell.classList.add('ring')
+    }
+
+    // ─── Toast ────────────────────────────────
+    function showToast(enquiry) {
+        const toast = document.getElementById('toast')
+        document.getElementById('toast-title').textContent =
+            `🔔 New Enquiry from ${enquiry.name}`
+        document.getElementById('toast-body').textContent =
+            enquiry.message.length > 60
+            ? enquiry.message.substring(0, 60) + '...'
+            : enquiry.message
+
+        toast.classList.add('show')
+        setTimeout(() => toast.classList.remove('show'), 4000)
+    }
+
+    // ─── Clear All ────────────────────────────
+    function clearAll() {
+        unreadCount = 0
+        updateCounts()
+
+        document.getElementById('badge').style.display = 'none'
+        document.getElementById('notification-list').innerHTML = `
+            <div class="empty-state" id="empty-state">
+                <div class="icon">📭</div>
+                <p>Waiting for enquiries...</p>
+            </div>
+        `
+    }
+</script>
+</body>
+</html>

@@ -1,12 +1,24 @@
 const Enquiry = require('../models/enquiry.model');
-
+const { ADMIN_ROOM } = require('../utils/sockethandler');
 
 // Create a new enquiry
 exports.createEnquiry = async (req, res) => {
     try {
         const { name, email, message } = req.body;
+        
         const newEnquiry = new Enquiry({ name, email, message });
+
         await newEnquiry.save();
+
+        const io = req.app.get('io'); // Get the socket.io instance
+
+        io.to(ADMIN_ROOM).emit(
+            'new_enquiry', {
+            message: 'New enquiry received!',
+            enquiry: newEnquiry
+        }
+
+        ); // Emit event to admin room
         res.status(201).json({ message: 'Enquiry created successfully', enquiry: newEnquiry });
     } catch (error) {
         res.status(500).json({ message: 'Failed to create enquiry', error: error.message });
