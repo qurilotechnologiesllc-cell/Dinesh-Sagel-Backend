@@ -66,7 +66,7 @@ exports.updateBanner = async (req, res) => {
         if (req.file) {
             // If a new image is uploaded, delete the old one from Cloudinary
             await deleteImage(banner.public_id);
-            const result = await uploadToCloudinary(req.file.buffer, 'banners');
+            const result = await uploadToCloudinary(req.file.buffer, 'gym/images');
             banner.imageUrl = result.secure_url;
             banner.public_id = result.public_id;
         }
