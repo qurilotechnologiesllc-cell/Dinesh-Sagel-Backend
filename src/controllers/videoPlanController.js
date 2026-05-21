@@ -2,8 +2,8 @@ const VideoPlan = require('../models/videoPlan.model');
 
 exports.addVideoPlan = async (req, res) => {
     try {
-        const { title, description, duration } = req.body;
-        const newVideoPlan = new VideoPlan({ title, description, duration });
+        const { title, price, duration } = req.body;
+        const newVideoPlan = new VideoPlan({ title, price, duration });
         await newVideoPlan.save();
         res.status(201).json({ message: 'Video plan added successfully', videoPlan: newVideoPlan });
     } catch (error) {
@@ -25,8 +25,8 @@ exports.getAllVideoPlans = async (req, res) => {
 exports.updateVideoPlan = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, description, duration } = req.body;
-        const updatedVideoPlan = await VideoPlan.findByIdAndUpdate(id, { title, description, duration }, { new: true });
+        const { title, price, duration } = req.body;
+        const updatedVideoPlan = await VideoPlan.findByIdAndUpdate(id, { title, price, duration }, { new: true });
         if (!updatedVideoPlan) {
             return res.status(404).json({ message: 'Video plan not found' });
         }
