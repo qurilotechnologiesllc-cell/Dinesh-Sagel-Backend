@@ -10,14 +10,23 @@ const planSchema = new Schema({
         type: String,
         required: true
     },
+
+    currencyCode: {
+        type: String,
+        Required: true,
+        default: 'INR'
+    },
+
     price: {
         type: Number,
         required: true
     },
+
     duration: {
         type: String,
         required: true
     },
+
     category: {
         type: String,
         enum: ["transformation", "diet"],
