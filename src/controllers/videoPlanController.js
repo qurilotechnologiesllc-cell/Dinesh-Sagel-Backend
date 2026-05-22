@@ -14,8 +14,7 @@ exports.addVideoPlan = async (req, res) => {
 
 exports.getAllVideoPlans = async (req, res) => {
     try {
-        const { currencyCode } = req.query;
-        let videoPlans = await VideoPlan.find({ currencyCode: currencyCode });
+        let videoPlans = await VideoPlan.find();
         if (videoPlans.length === 0) {
             return res.status(404).json({ message: 'No video plans found for the specified currency' });
         }
