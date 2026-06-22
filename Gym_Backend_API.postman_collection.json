@@ -324,6 +324,166 @@
             ]
         },
         {
+            "name": "User Auth",
+            "item": [
+                {
+                    "name": "Sign Up",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"john_doe\",\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"StrongPassword123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/auth/signUp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "auth",
+                                "signUp"
+                            ]
+                        },
+                        "description": "Register a new user with username, email, and password"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john.doe@example.com\",\n  \"password\": \"StrongPassword123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login a user with email and password"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Forgot Password (Send OTP)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john.doe@example.com\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/auth/forgot-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "auth",
+                                "forgot-password"
+                            ]
+                        },
+                        "description": "Send OTP to the registered email for password reset"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Verify OTP",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"verificationId\": \"your_verification_id_here\",\n  \"otp\": \"123456\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/auth/verify-otp",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "auth",
+                                "verify-otp"
+                            ]
+                        },
+                        "description": "Verify the OTP using verificationId and otp to get a reset token"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Reset Password",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"resetToken\": \"your_reset_token_here\",\n  \"newPassword\": \"NewStrongPassword123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/user/auth/reset-password",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "user",
+                                "auth",
+                                "reset-password"
+                            ]
+                        },
+                        "description": "Reset the password using resetToken and newPassword"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
             "name": "Blog",
             "item": [
                 {

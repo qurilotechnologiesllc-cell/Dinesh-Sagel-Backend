@@ -8,6 +8,7 @@ const { socketHandler } = require('./utils/sockethandler');
 
 // these are the routes imported from the routers folder
 const adminAuthRoutes = require('./routers/adminAuthRoutes');
+const userAuthRoutes = require('./routers/userAuthRoutes')
 const contactUsRoutes = require('./routers/contactUsRoutes');
 const blogRoutes = require('./routers/blogRoutes');
 const gymPlanRoutes = require('./routers/gymplanRoutes');
@@ -33,6 +34,7 @@ app.use(express.json());
 // app.use(express.static(path.join(__dirname, "public")))
 
 app.use('/api/admin/auth', adminAuthRoutes);
+app.use('/api/user/auth', userAuthRoutes);
 app.use('/api/plans', gymPlanRoutes);
 app.use('/api/blogs', blogRoutes);
 app.use('/api', userEnquiryRoutes);
