@@ -4,9 +4,9 @@ const { ADMIN_ROOM } = require('../utils/sockethandler');
 // Create a new enquiry
 exports.createEnquiry = async (req, res) => {
     try {
-        const { name, email, message } = req.body;
+        const { name, email, message, mobileNumber } = req.body;
         
-        const newEnquiry = new Enquiry({ name, email, message });
+        const newEnquiry = new Enquiry({ name, email, message, mobileNumber });
 
         await newEnquiry.save();
 

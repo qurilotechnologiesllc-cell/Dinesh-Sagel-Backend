@@ -13,6 +13,17 @@ const enquirySchema = new Schema({
         type: String,
         required: true,
     },
+
+    mobileNumber: {
+        type: String,
+        required: [true, "Mobile number is required"],
+        trim: true,
+        match: [
+            /^[0-9]{10}$/,
+            "Mobile number must contain exactly 10 digits"
+        ]
+    },
+    
     isRead: {
         type: Boolean,
         default: false,
