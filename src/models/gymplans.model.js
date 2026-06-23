@@ -10,16 +10,28 @@ const planSchema = new Schema({
         required: true
     },
 
-    currencyCode: {
-        type: String,
-        Required: true,
-        default: 'INR'
-    },
+    allprice: [
+        {
+            currencyCode: {
+                type: String,
+                required: true,
+                enum: ['INR', 'USD', 'GBP', 'CAD'],  // ✅ sirf valid currencies
+                uppercase: true
+            },
 
-    price: {
-        type: Number,
-        required: true
-    },
+            price: {
+                type: Number,
+                required: true,
+                min: 0
+            },
+
+            symbol: {
+                type: String,
+                enum: ['₹', '$', '£', 'CA$'],         // ✅ frontend display ke liye
+                required: true
+            }
+        }
+    ],
 
     duration: {
         type: String,
@@ -40,6 +52,16 @@ const planSchema = new Schema({
 }, { timestamps: true });
 
 planSchema.index({ category: 1 });
+
+// ✅ Duplicate currency validation
+planSchema.pre('save', function (next) {
+    const codes = this.allprice.map(p => p.currencyCode);
+    const unique = new Set(codes);
+    if (codes.length !== unique.size) {
+        return next(new Error('Duplicate currency codes not allowed'));
+    }
+    next;
+});
 
 const Plan = model('Plan', planSchema);
 

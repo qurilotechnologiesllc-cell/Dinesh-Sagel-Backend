@@ -699,7 +699,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"name\": \"Gold Plan\",\n  \"price\": 4999,\n  \"duration\": \"3 months\",\n  \"features\": [\"Gym Access\", \"Personal Trainer\", \"Nutrition Plan\"]\n}"
+                            "raw": "{\n  \"name\": \"Gold Plan\",\n  \"description\": \"Intensive 3-month transformation program\",\n  \"allprice\": [\n    {\n      \"currencyCode\": \"INR\",\n      \"price\": 4999,\n      \"symbol\": \"₹\"\n    },\n    {\n      \"currencyCode\": \"USD\",\n      \"price\": 59,\n      \"symbol\": \"$\"\n    }\n  ],\n  \"duration\": \"3 months\",\n  \"category\": \"transformation\",\n  \"features\": [\"Gym Access\", \"Personal Trainer\", \"Nutrition Plan\"]\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/plans/plans",
@@ -749,7 +749,7 @@
                         ],
                         "body": {
                             "mode": "raw",
-                            "raw": "{\n  \"name\": \"Gold Plan Updated\",\n  \"price\": 5999,\n  \"duration\": \"6 months\",\n  \"features\": [\"Gym Access\", \"Personal Trainer\", \"Nutrition Plan\", \"Physiotherapy\"]\n}"
+                            "raw": "{\n  \"name\": \"Gold Plan Updated\",\n  \"description\": \"Updated 6-month transformation package with physiotherapy support\",\n  \"allprice\": [\n    {\n      \"currencyCode\": \"INR\",\n      \"price\": 5999,\n      \"symbol\": \"₹\"\n    }\n  ],\n  \"duration\": \"6 months\",\n  \"category\": \"transformation\",\n  \"features\": [\"Gym Access\", \"Personal Trainer\", \"Nutrition Plan\", \"Physiotherapy\"]\n}"
                         },
                         "url": {
                             "raw": "{{base_url}}/api/plans/plans/:id",
