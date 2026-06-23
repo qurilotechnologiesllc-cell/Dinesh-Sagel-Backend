@@ -14,6 +14,11 @@
             "key": "admin_token",
             "value": "",
             "type": "string"
+        },
+        {
+            "key": "user_token",
+            "value": "",
+            "type": "string"
         }
     ],
     "item": [
@@ -359,6 +364,21 @@
                 },
                 {
                     "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "  const response = pm.response.json();",
+                                    "  if (response.token) {",
+                                    "    pm.environment.set('user_token', response.token);",
+                                    "  }",
+                                    "}"
+                                ]
+                            }
+                        }
+                    ],
                     "request": {
                         "method": "POST",
                         "header": [
@@ -478,6 +498,46 @@
                             ]
                         },
                         "description": "Reset the password using resetToken and newPassword"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "Payment",
+            "item": [
+                {
+                    "name": "Initiate Plan Purchase",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json",
+                                "type": "text"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{user_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"course_id\": \"plan_id_here\",\n  \"full_name\": \"John Doe\",\n  \"age\": 28,\n  \"sex\": \"Male\",\n  \"email\": \"john.doe@example.com\",\n  \"mobile_number\": \"9876543210\",\n  \"description\": \"I want to join the transformation program.\",\n  \"past_injury\": \"None\",\n  \"goal\": \"Build muscle and lose fat\",\n  \"currencyCode\": \"INR\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/purchase/plan",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "api",
+                                "purchase",
+                                "plan"
+                            ]
+                        },
+                        "description": "Initiate a payment for a gym plan purchase using authenticated user token"
                     },
                     "response": []
                 }
