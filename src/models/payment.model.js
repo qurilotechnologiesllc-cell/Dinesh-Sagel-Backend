@@ -59,6 +59,13 @@ const paymentSchema = new Schema(
             default: "",
         },
 
+        currencyCode: {
+            type: String,
+            required: true,
+            enum: ['INR', 'USD', 'GBP', 'CAD'],  // ✅ sirf valid currencies
+            uppercase: true
+        },
+
         amount: {
             type: Number,
             required: true,
@@ -72,8 +79,23 @@ const paymentSchema = new Schema(
 
         payment_method: {
             type: String,
-            enum: ["paytm", "upi", "razorpay", "phonepe"],
-            default: "paytm",
+            enum: ["upi", "debit card", "credit card"],
+            default: "upi",
+        },
+
+        gateway: {
+            type: String,
+            default: "razorpay"
+        },
+
+        razorpay_order_id: {
+            type: String,
+            default: null
+        },
+
+        razorpay_payment_id: {
+            type: String,
+            default: null
         },
 
         payment_details: {

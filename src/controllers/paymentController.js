@@ -1,6 +1,7 @@
 const Payment = require('../models/payment.model');
 const User = require('../models/user.models');
 const Plan = require('../models/gymplans.model');
+const razorpay = require('../utils/razorpay')
 
 const purchaseCourse = async (req, res) => {
     try {
@@ -38,6 +39,7 @@ const purchaseCourse = async (req, res) => {
             past_injury,
             goal,
             amount: currencyEntry.price,
+            currencyCode,
             payment_status: 'pending',
             payment_details: {}
         });
@@ -54,4 +56,65 @@ const purchaseCourse = async (req, res) => {
     }
 };
 
-module.exports = { purchaseCourse };
+const InitiatedPayments = async (req, res) => {
+    try {
+        const { paymentId } = req.params;
+
+        console.log(paymentId);
+        
+
+        const payment = await Payment.findById(paymentId);
+
+        if (!payment) {
+            return res.status(404).json({
+                success: false,
+                message: "Payment not found"
+            });
+        }
+
+        if (payment.payment_status === "success") {
+            return res.status(400).json({
+                success: false,
+                message: "Payment already completed"
+            });
+        }
+
+        const order = await razorpay.orders.create({
+            amount: payment.amount * 100,
+            currency: payment.currencyCode,
+            receipt: payment._id.toString()
+        });
+
+        payment.razorpay_order_id = order.id;
+        await payment.save();
+
+        return res.status(200).json({
+            success: true,
+
+            paymentId: payment._id,
+
+            razorpayOrderId: order.id,
+
+            amount: order.amount,
+
+            currency: order.currency,
+
+            key: process.env.RAZORPAY_KEY_ID,
+
+            paymentType:
+                payment.currencyCode === "INR"
+                    ? "upi_or_card"
+                    : "card"
+        });
+
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+module.exports = { purchaseCourse , InitiatedPayments};
