@@ -74,7 +74,7 @@ const InitiatedPayments = async (req, res) => {
         const { paymentId } = req.params;
 
         console.log(paymentId);
-        
+
 
         const payment = await Payment.findById(paymentId);
 
@@ -130,4 +130,14 @@ const InitiatedPayments = async (req, res) => {
     }
 };
 
-module.exports = { purchaseCourse , InitiatedPayments};
+const razorpayWebhookController = async (req, res) => {
+
+        console.log(req.body);
+
+        return res.status(200).json({
+            success: true
+        });
+
+    }
+
+module.exports = { purchaseCourse, InitiatedPayments, razorpayWebhookController };
