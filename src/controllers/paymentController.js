@@ -21,9 +21,9 @@ const purchaseCourse = async (req, res) => {
 
         // ✅ plantype ke hisaab se sahi collection mein dhundo
         let plan;
-        if (plantype === 'transformation') {
+        if (plantype === 'transformationPlan') {
             plan = await Plan.findById(course_id);
-        } else if (plantype === 'video') {
+        } else if (plantype === 'videoPlan') {
             plan = await VideoPlan.findById(course_id);
         }
 
