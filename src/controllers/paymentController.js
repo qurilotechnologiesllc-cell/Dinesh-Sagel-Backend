@@ -1,23 +1,34 @@
 const Payment = require('../models/payment.model');
 const User = require('../models/user.models');
 const Plan = require('../models/gymplans.model');
+const VideoPlan = require("../models/videoPlan.model")
 const razorpay = require('../utils/razorpay')
 
 const purchaseCourse = async (req, res) => {
     try {
+        const { course_id, full_name, age, sex, email, mobile_number, description, past_injury, goal, currencyCode, plantype } = req.body;
 
-        const { course_id, full_name, age, sex, email, mobile_number, description, past_injury, goal, currencyCode } = req.body;
+        // ✅ plantype validation
+        if (!plantype || !['transformationPlan', 'videoPlan'].includes(plantype)) {
+            return res.status(400).json({ message: 'Invalid plantype. Must be transformation or video' });
+        }
 
-        // ✅ User exists check — token se aaya hai
+        // ✅ User exists check
         const user = await User.findById(req.user.id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // ✅ Plan exists check
-        const plan = await Plan.findById(course_id);
+        // ✅ plantype ke hisaab se sahi collection mein dhundo
+        let plan;
+        if (plantype === 'transformation') {
+            plan = await Plan.findById(course_id);
+        } else if (plantype === 'video') {
+            plan = await VideoPlan.findById(course_id);
+        }
+
         if (!plan) {
-            return res.status(404).json({ message: 'Plan not found' });
+            return res.status(404).json({ message: `${plantype} plan not found` });
         }
 
         // ✅ Currency ke hisaab se amount nikalo
@@ -30,6 +41,7 @@ const purchaseCourse = async (req, res) => {
         const payment = await Payment.create({
             user_id: req.user.id,
             course_id,
+            plantype,
             full_name,
             age,
             sex,
@@ -39,7 +51,7 @@ const purchaseCourse = async (req, res) => {
             past_injury,
             goal,
             amount: currencyEntry.price,
-            currencyCode,
+            currencyCode: currencyEntry.currencyCode,
             payment_status: 'pending',
             payment_details: {}
         });
@@ -48,7 +60,8 @@ const purchaseCourse = async (req, res) => {
             message: 'Payment initiated, complete payment to confirm',
             payment_id: payment._id,
             amount: currencyEntry.price,
-            currency: currencyEntry.currencyCode
+            currency: currencyEntry.currencyCode,
+            plantype
         });
 
     } catch (error) {
