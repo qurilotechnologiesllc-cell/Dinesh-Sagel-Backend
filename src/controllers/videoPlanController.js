@@ -21,7 +21,7 @@ exports.addVideoPlan = async (req, res) => {
             }
         }
 
-        const newVideoPlan = new VideoPlan({ title, allprice, duration });
+        const newVideoPlan = new VideoPlan({ name: title, allprice, duration });
 
         await newVideoPlan.save();
 
@@ -75,7 +75,7 @@ exports.updateVideoPlan = async (req, res) => {
         }
 
         if (duration !== undefined) videoplan.duration = duration;
-        if (title !== undefined) videoplan.title = title;
+        if (title !== undefined) videoplan.name = title;
 
         await videoplan.save();
 

@@ -9,9 +9,15 @@ const paymentSchema = new Schema(
         },
 
         course_id: {
-            type: Types.ObjectId,
-            ref: "Course",
+            type: Schema.Types.ObjectId,
             required: true,
+            refPath: "course_type"
+        },
+
+        course_type: {
+            type: String,
+            required: true,
+            enum: ["Plan", "VideoPlan"]
         },
 
         full_name: {
@@ -79,7 +85,7 @@ const paymentSchema = new Schema(
 
         payment_method: {
             type: String,
-            enum: ["upi", "debit card", "credit card"],
+            // enum: ["upi", "debit card", "credit card"],
             default: "upi",
         },
 
@@ -107,5 +113,18 @@ const paymentSchema = new Schema(
         timestamps: true,
     }
 );
+
+// Webhook ke liye (Most Important)
+paymentSchema.index(
+    { razorpay_order_id: 1 },
+    { unique: true, sparse: true }
+);
+
+// User ki payment history
+paymentSchema.index({ user_id: 1 });
+
+
+// Recent payments
+paymentSchema.index({ createdAt: -1 });
 
 module.exports = model("Payment", paymentSchema);

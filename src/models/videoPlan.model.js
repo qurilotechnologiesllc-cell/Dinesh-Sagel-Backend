@@ -1,7 +1,7 @@
 const { Schema, model } = require('mongoose');
 
 const videoPlanSchema = new Schema({
-    title: { type: String, required: true },
+    name: { type: String, required: true },
     allprice: [
         {
             currencyCode: {

@@ -1,4 +1,5 @@
 const Payment = require('../models/payment.model');
+const crypto = require("crypto")
 const User = require('../models/user.models');
 const Plan = require('../models/gymplans.model');
 const VideoPlan = require("../models/videoPlan.model")
@@ -41,7 +42,7 @@ const purchaseCourse = async (req, res) => {
         const payment = await Payment.create({
             user_id: req.user.id,
             course_id,
-            plantype,
+            course_type: plantype == 'transformationPlan' ? 'Plan' : 'VideoPlan',
             full_name,
             age,
             sex,
@@ -72,8 +73,6 @@ const purchaseCourse = async (req, res) => {
 const InitiatedPayments = async (req, res) => {
     try {
         const { paymentId } = req.params;
-
-        console.log(paymentId);
 
 
         const payment = await Payment.findById(paymentId);
@@ -131,13 +130,161 @@ const InitiatedPayments = async (req, res) => {
 };
 
 const razorpayWebhookController = async (req, res) => {
+    try {
 
-        console.log(req.body);
+        // Verify webhook signature
+        const webhookSignature = req.headers["x-razorpay-signature"];
+
+        const generatedSignature = crypto
+            .createHmac(
+                "sha256",
+                process.env.RAZORPAY_WEBHOOK_SECRET
+            )
+            .update(JSON.stringify(req.body))
+            .digest("hex");
+
+        if (generatedSignature !== webhookSignature) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Webhook Signature"
+            });
+        }
+
+        const event = req.body.event;
+
+        switch (event) {
+
+            case "payment.captured": {
+
+                const paymentEntity = req.body.payload.payment.entity;
+
+                // Find payment using Razorpay Order ID
+                const payment = await Payment.findOne({
+                    razorpay_order_id: paymentEntity.order_id
+                });
+
+                if (!payment) {
+                    return res.status(404).json({
+                        success: false,
+                        message: "Payment document not found"
+                    });
+                }
+
+                // Ignore duplicate webhook
+                if (payment.payment_status === "success") {
+                    return res.status(200).json({
+                        success: true,
+                        message: "Payment already processed"
+                    });
+                }
+
+                payment.payment_status = "success";
+
+                payment.razorpay_payment_id = paymentEntity.id;
+
+                payment.payment_method = paymentEntity.method;
+
+                // Store complete Razorpay payment payload
+                payment.payment_details = paymentEntity;
+
+                await payment.save();
+
+                console.log("Payment Updated Successfully");
+
+                break;
+            }
+
+            case "payment.failed": {
+
+                const paymentEntity = req.body.payload.payment.entity;
+
+                const payment = await Payment.findOne({
+                    razorpay_order_id: paymentEntity.order_id
+                });
+
+                if (payment) {
+
+                    payment.payment_status = "failed";
+
+                    payment.payment_method = paymentEntity.method;
+
+                    payment.payment_details = paymentEntity;
+
+                    await payment.save();
+
+                    console.log("Payment Failed Updated");
+                }
+
+                break;
+            }
+
+            default:
+                console.log(`Unhandled Event: ${event}`);
+        }
 
         return res.status(200).json({
             success: true
         });
 
-    }
+    } catch (error) {
 
-module.exports = { purchaseCourse, InitiatedPayments, razorpayWebhookController };
+        console.error("Webhook Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};
+
+const getallPaymentsDetails = async (req, res) => {
+    try {
+
+        // Verify Admin
+        if (req.user.role !== "admin") {
+            return res.status(403).json({
+                success: false,
+                message: "Unauthorized User"
+            });
+        }
+
+        // Fetch Payments
+        const payments = await Payment.find()
+            .populate({
+                path: "course_id",
+                select: "name"
+            })
+            .sort({ createdAt: -1 });
+
+        // Response Data
+        const paymentList = payments.map(payment => ({
+            payment_id: payment._id,
+            full_name: payment.full_name,
+            course_name: payment.course_id?.name || null,
+            gender: payment.sex,
+            payment_status: payment.payment_status,
+            amount: payment.amount,
+            currency: payment.currencyCode,
+            payment_method: payment.payment_method,
+            payment_date: payment.createdAt
+        }));
+
+        return res.status(200).json({
+            success: true,
+            totalPayments: paymentList.length,
+            payments: paymentList
+        });
+
+    } catch (error) {
+
+        console.error("Get Payments Error:", error);
+
+        return res.status(500).json({
+            success: false,
+            message: "Internal Server Error"
+        });
+    }
+};
+
+
+module.exports = { purchaseCourse, InitiatedPayments, razorpayWebhookController, getallPaymentsDetails };
