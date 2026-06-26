@@ -85,8 +85,7 @@ const paymentSchema = new Schema(
 
         payment_method: {
             type: String,
-            // enum: ["upi", "debit card", "credit card"],
-            default: "upi",
+            default: "",
         },
 
         gateway: {
