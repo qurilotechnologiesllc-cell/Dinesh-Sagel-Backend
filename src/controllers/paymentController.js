@@ -258,7 +258,7 @@ const getallPaymentsDetails = async (req, res) => {
 
         // Response Data
         const paymentList = payments.map(payment => ({
-            payment_id: payment._id,
+            payment_id: payment.razorpay_payment_id,
             full_name: payment.full_name,
             course_name: payment.course_id?.name || null,
             gender: payment.sex,
