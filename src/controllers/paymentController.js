@@ -111,7 +111,7 @@ const InitiatedPayments = async (req, res) => {
 
             currency: order.currency,
 
-            key: process.env.RAZORPAY_KEY_ID,
+            key: process.env.RAZORPAY_LIVE_KEY_ID,
 
             paymentType:
                 payment.currencyCode === "INR"
