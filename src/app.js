@@ -20,8 +20,12 @@ const paymentsRoutes = require("./routers/paymentsRoutes")
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: '*',
-        methods: ['GET', 'POST', 'DELETE', 'PUT']
+        origin: [
+            "https://dineshsehgal.com",
+            "https://admin.dineshsehgal.com"
+        ],
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 
@@ -29,7 +33,11 @@ app.set('io', io) // Make io accessible in routes/controllers via req.app.get('i
 
 socketHandler(io);
 
-app.use(cors());
+app.use(cors({
+    origin: ['https://dineshsehgal.com', 'https://admin.dineshsehgal.com'],
+    methods: ['GET', 'POST', 'DELETE', 'PUT'],
+    credentials: true
+}));
 app.use(express.json());
 
 // app.use(express.static(path.join(__dirname, "public")))
