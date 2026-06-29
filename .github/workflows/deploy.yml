@@ -10,8 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Debug Secrets
+        env:
+          HOST: ${{ secrets.VPS_HOST }}
+          USERNAME: ${{ secrets.VPS_USER }}
+          PASSWORD: ${{ secrets.VPS_PASSWORD }}
+          KEY: ${{ secrets.VPS_SSH_KEY }}
+        run: |
+          echo "HOST length: ${#HOST}"
+          echo "USERNAME length: ${#USERNAME}"
+          echo "PASSWORD length: ${#PASSWORD}"
+          echo "KEY length: ${#KEY}"
+
       - name: Deploy to VPS
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
