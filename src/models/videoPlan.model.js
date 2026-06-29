@@ -24,6 +24,10 @@ const videoPlanSchema = new Schema({
             }
         }
     ],
+    category: {
+        type: String,
+        default: 'VideoPlan'
+    },
     duration: { type: String, required: true }, // Duration in seconds
 }, { timestamps: true });
 

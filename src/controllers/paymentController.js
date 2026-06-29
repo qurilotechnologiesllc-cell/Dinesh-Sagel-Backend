@@ -7,10 +7,10 @@ const razorpay = require('../utils/razorpay')
 
 const purchaseCourse = async (req, res) => {
     try {
-        const { course_id, full_name, age, sex, email, mobile_number, description, past_injury, goal, currencyCode, plantype } = req.body;
+        const { course_id, full_name, age, sex, email, mobile_number, description, past_injury, goal, currencyCode, category } = req.body;
 
         // ✅ plantype validation
-        if (!plantype || !['transformationPlan', 'videoPlan'].includes(plantype)) {
+        if (!category || !['transformation', 'diet', 'videoPlan'].includes(category)) {
             return res.status(400).json({ message: 'Invalid plantype. Must be transformation or video' });
         }
 
@@ -22,9 +22,9 @@ const purchaseCourse = async (req, res) => {
 
         // ✅ plantype ke hisaab se sahi collection mein dhundo
         let plan;
-        if (plantype === 'transformationPlan') {
+        if (category === 'transformation' || category === 'diet') {
             plan = await Plan.findById(course_id);
-        } else if (plantype === 'videoPlan') {
+        } else if (category === 'videoPlan') {
             plan = await VideoPlan.findById(course_id);
         }
 
@@ -42,7 +42,7 @@ const purchaseCourse = async (req, res) => {
         const payment = await Payment.create({
             user_id: req.user.id,
             course_id,
-            course_type: plantype == 'transformationPlan' ? 'Plan' : 'VideoPlan',
+            course_type: category == 'transformation' || category == 'diet'  ? 'Plan' : 'VideoPlan',
             full_name,
             age,
             sex,
@@ -62,7 +62,7 @@ const purchaseCourse = async (req, res) => {
             payment_id: payment._id,
             amount: currencyEntry.price,
             currency: currencyEntry.currencyCode,
-            plantype
+            category
         });
 
     } catch (error) {

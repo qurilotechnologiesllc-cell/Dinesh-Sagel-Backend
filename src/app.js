@@ -22,7 +22,8 @@ const io = new Server(server, {
     cors: {
         origin: [
             "https://dineshsehgal.com",
-            "https://admin.dineshsehgal.com"
+            "https://admin.dineshsehgal.com",
+            "http://localhost:3000"
         ],
         methods: ["GET", "POST"],
         credentials: true
@@ -34,7 +35,7 @@ app.set('io', io) // Make io accessible in routes/controllers via req.app.get('i
 socketHandler(io);
 
 app.use(cors({
-    origin: ['https://dineshsehgal.com', 'https://admin.dineshsehgal.com'],
+    origin: ['https://dineshsehgal.com', 'https://admin.dineshsehgal.com', 'http://localhost:3000'],
     methods: ['GET', 'POST', 'DELETE', 'PUT'],
     credentials: true
 }));
