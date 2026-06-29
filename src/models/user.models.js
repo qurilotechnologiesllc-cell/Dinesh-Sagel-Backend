@@ -27,9 +27,7 @@ const userSchema = new Schema(
             required: [true, "Password is required"],
             validate: {
                 validator: function (value) {
-                    return /^(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>])[A-Z].{7,}$/.test(
-                        value
-                    );
+                    return /^(?=.*\d)(?=.*[^A-Za-z0-9])[A-Z].{7,}$/.test(value);
                 },
                 message:
                     "Password must be at least 8 characters long, start with a capital letter, contain at least one number and one special character.",
