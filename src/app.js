@@ -54,7 +54,7 @@ app.use('/api', VideoPlanRoutes);
 app.use('/api', paymentsRoutes)
 
 app.get('/', (req, res) => {
-    res.send('Welcome to the Gym API ');
+    res.send('Welcome to the Gym API');
 });
 
 module.exports = { app, server };
