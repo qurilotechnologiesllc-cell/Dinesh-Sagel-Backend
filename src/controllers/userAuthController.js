@@ -2,7 +2,7 @@ const User = require('../models/user.models')
 const bcrypt = require('bcrypt')
 const redisClient = require('../utils/redis');
 const { generateToken } = require("../middleware/auth")
-const { sendEmailOtp } = require("../utils/sendMail")
+const { sendEmailOtpToUser } = require("../utils/sendMail")
 const { v4: uuidv4 } = require("uuid");
 
 const generateOTP = () => {
@@ -104,15 +104,12 @@ const forgotPasswordwithOtp = async (req, res) => {
         // Step 4 — OTP generate karo
         const otp = generateOTP()
         const verificationId = uuidv4();
-
-
-        console.log(otp, verificationId);
         
 
         // Step 5 — OTP Redis mein store karo (10 minute ke liye)
         await redisClient.setex(`forgot-password:otp:${verificationId}`, 600, JSON.stringify({ email, otp }));
 
-        await sendEmailOtp(email, otp, user.username)
+        await sendEmailOtpToUser(email, otp, user.username)
 
         return res.status(200).json({ success: true, message: 'OTP sent to email', verificationId: verificationId, });
 

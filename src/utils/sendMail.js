@@ -12,7 +12,7 @@ const sendEmailOtp = async (email, otp, name) => {  // ← name add kiya!
 
             sender: {
                 email: process.env.BREVO_USER,
-                name: "Gym Management System",
+                name: "Dinesh Sehgal Fitness Movement",
             },
 
             to: [
@@ -22,7 +22,7 @@ const sendEmailOtp = async (email, otp, name) => {  // ← name add kiya!
                 },
             ],
 
-            templateId: 3,        // ← URL mein /edit/3 dikh raha hai!
+            templateId: 1,        // ← URL mein /edit/3 dikh raha hai!
 
             params: {
                 name: name,     // ← {{params.name}} ke liye ✅
@@ -38,4 +38,36 @@ const sendEmailOtp = async (email, otp, name) => {  // ← name add kiya!
     }
 }
 
-module.exports = { sendEmailOtp }
+const sendEmailOtpToUser = async (email, otp, name) => {  // ← name add kiya!
+    try {
+        const response = await apiInstance.sendTransacEmail({
+
+            sender: {
+                email: process.env.BREVO_USER,
+                name: "Dinesh Sehgal Fitness Movement",
+            },
+
+            to: [
+                {
+                    email: email,
+                    name: name,   // ← Ye bhi add karo!
+                },
+            ],
+
+            templateId: 2,        // ← URL mein /edit/3 dikh raha hai!
+
+            params: {
+                name: name,     // ← {{params.name}} ke liye ✅
+                otp: otp,      // ← {{params.otp}} ke liye ✅
+                expiry: "10",     // ← {{params.expiry}} ke liye ✅
+            },
+        });
+
+        console.log("Email Sent!", response)
+
+    } catch (error) {
+        console.log(error.response?.body || error.message)
+    }
+}
+
+module.exports = { sendEmailOtp, sendEmailOtpToUser }
