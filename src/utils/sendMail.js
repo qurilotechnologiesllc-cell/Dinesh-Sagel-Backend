@@ -12,7 +12,7 @@ const sendEmailOtp = async (email, otp, name) => {  // ← name add kiya!
 
             sender: {
                 email: process.env.BREVO_USER,
-                name: "Dinesh Sehgal Fitness Movement",
+                name: "Dinesh Sehgal Fitness",
             },
 
             to: [
@@ -44,7 +44,7 @@ const sendEmailOtpToUser = async (email, otp, name) => {  // ← name add kiya!
 
             sender: {
                 email: process.env.BREVO_USER,
-                name: "Dinesh Sehgal Fitness Movement",
+                name: "Dinesh Sehgal Fitness",
             },
 
             to: [
